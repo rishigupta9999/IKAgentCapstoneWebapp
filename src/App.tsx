@@ -2,26 +2,29 @@ import React from 'react';
 import { useState, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { Conversation } from './models/Conversation';
+import { Turn } from './models/Turn';
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community'; 
 import { AgGridReact } from 'ag-grid-react'; // React Data Grid Component
 
 // Register all Community features
 ModuleRegistry.registerModules([AllCommunityModule]);
 
-const GridExample = () => {
-  // Row Data: The data to be displayed.
-  const [rowData, setRowData] = useState([
-      { make: "Tesla", model: "Model Y", price: 64950, electric: true },
-      { make: "Ford", model: "F-Series", price: 33850, electric: false },
-      { make: "Toyota", model: "Corolla", price: 29600, electric: false },
-  ]);
+interface RowData {
+  speaker: string;
+  phrase: string;
+}
+
+const GridExample = ({ conversation }: { conversation: Conversation | null }) => {
+  // Convert conversation turns to row data
+  const rowData = conversation?.turns.map(turn => ({
+    speaker: turn.speaker,
+    phrase: turn.content
+  })) || [];
 
   // Column Definitions: Defines the columns to be displayed.
   const [colDefs, setColDefs] = useState([
-      { field: "make" as const },
-      { field: "model" as const },
-      { field: "price" as const },
-      { field: "electric" as const }
+      { field: "speaker" as const },
+      { field: "phrase" as const }
   ]);
 
   // ...
@@ -34,7 +37,7 @@ const GridExample = () => {
             columnDefs={colDefs}
         />
     </div>
-)
+  )
 }
 
 
@@ -44,13 +47,7 @@ function App(): JSX.Element {
   const socketRef = useRef<WebSocket | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
-  const conversationRef = useRef<Conversation|null>(null);
-
-
-  conversationRef.current = {
-    id: uuidv4(),
-    turns: []
-  };
+  const [conversation, setConversation] = useState<Conversation | null>(null);
 
   const handleTranscriptionToggle = async () => {
     if (isTranscribing) {
@@ -59,6 +56,11 @@ function App(): JSX.Element {
       socketRef.current?.close();
       setIsTranscribing(false);
     } else {
+      setConversation({
+        id: uuidv4(),
+        turns: []
+      });
+      
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         streamRef.current = stream;
@@ -88,6 +90,21 @@ function App(): JSX.Element {
           console.log(`Result ${JSON.stringify(result)}`)
           if (result) {
             setTranscript((prev) => prev + ' ' + result);
+
+            console.log(`Speaker ${JSON.stringify(received.channel.alternatives[0].words[0].speaker)}`)
+
+            const speakerNum = received.channel.alternatives[0].words?.[0]?.speaker;
+            const turn: Turn = {
+              id: uuidv4(),
+              speaker: speakerNum !== undefined ? `${speakerNum}` : 'Unknown',
+              content: result,
+              timestamp: new Date()
+            };
+
+            setConversation(prev => prev ? {
+              ...prev,
+              turns: [...prev.turns, turn]
+            } : null);
           }
         };
 
@@ -112,7 +129,7 @@ function App(): JSX.Element {
         {transcript || (isTranscribing ? 'Listening...' : 'Click the button to begin')}
       </div>
 
-      <GridExample/>
+      <GridExample conversation={conversation}/>
     </div>
 
     ); 

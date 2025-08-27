@@ -1,4 +1,6 @@
 export interface Turn {
     id: string; // UUID
-    text: string;
+    content: string;
+    speaker: string;
+    timestamp: Date;
 }
