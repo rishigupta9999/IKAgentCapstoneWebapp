@@ -1,6 +1,7 @@
 import React from 'react';
 import { useState, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import './App.css';
 import { Conversation } from './models/Conversation';
 import { Turn } from './models/Turn';
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community'; 
@@ -13,6 +14,15 @@ interface RowData {
   speaker: string;
   phrase: string;
 }
+
+const Conversations = () => {
+  return (
+    <div>
+      <h1>Conversations</h1>
+      <p>Conversation history will be displayed here.</p>
+    </div>
+  );
+};
 
 const GridExample = ({ conversation }: { conversation: Conversation | null }) => {
   // Convert conversation turns to row data
@@ -44,6 +54,8 @@ const GridExample = ({ conversation }: { conversation: Conversation | null }) =>
 function App(): JSX.Element {
   const [transcript, setTranscript] = useState('');
   const [isTranscribing, setIsTranscribing] = useState(false);
+  const [currentPage, setCurrentPage] = useState('intake');
+  const [menuOpen, setMenuOpen] = useState(false);
   const socketRef = useRef<WebSocket | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -117,22 +129,38 @@ function App(): JSX.Element {
 
 
 
-  return (
-    <div className="app">
+  const IntakePage = () => (
+    <div>
       <h1 className="header">Real-Time Transcription</h1>
-  
       <button onClick={handleTranscriptionToggle} className="toggle-button">
         {isTranscribing ? 'Stop Transcription' : 'Start Transcription'}
       </button>
-        
       <div className="transcript-box">
         {transcript || (isTranscribing ? 'Listening...' : 'Click the button to begin')}
       </div>
-
       <GridExample conversation={conversation}/>
     </div>
+  );
 
-    ); 
+  return (
+    <div className="app">
+      <div className={`sidebar ${menuOpen ? 'open' : ''}`}>
+        <button onClick={() => setMenuOpen(!menuOpen)} className="hamburger-btn">
+          ☰
+        </button>
+        {menuOpen && (
+          <div className="menu-items">
+            <button onClick={() => setCurrentPage('intake')}>Intake</button>
+            <button onClick={() => setCurrentPage('conversations')}>Conversations</button>
+          </div>
+        )}
+      </div>
+      
+      <div className={`main-content ${menuOpen ? 'shifted' : ''}`}>
+        {currentPage === 'intake' ? <IntakePage /> : <Conversations />}
+      </div>
+    </div>
+  ); 
 }
 
 
