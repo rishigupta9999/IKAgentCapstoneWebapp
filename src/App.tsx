@@ -1,5 +1,7 @@
 import React from 'react';
 import { useState, useRef } from 'react';
+import { v4 as uuidv4 } from 'uuid';
+import { Conversation } from './models/Conversation';
 
 function App(): JSX.Element {
   const [transcript, setTranscript] = useState('');
@@ -7,6 +9,12 @@ function App(): JSX.Element {
   const socketRef = useRef<WebSocket | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const conversationRef = useRef<Conversation|null>(null);
+
+  conversationRef.current = {
+    id: uuidv4(),
+    turns: []
+  };
 
   const handleTranscriptionToggle = async () => {
     if (isTranscribing) {
@@ -22,7 +30,7 @@ function App(): JSX.Element {
         const mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
         mediaRecorderRef.current = mediaRecorder;
 
-        const socket = new WebSocket('wss://api.deepgram.com/v1/listen?model=nova-3', [
+        const socket = new WebSocket('wss://api.deepgram.com/v1/listen?model=nova-3&diarize=true', [
           'token',
           process.env.REACT_APP_DEEPGRAM_API_KEY!
         ]);
@@ -31,7 +39,6 @@ function App(): JSX.Element {
         socket.onopen = () => {
           mediaRecorder.addEventListener('dataavailable', (event) => {
             if (socket.readyState === WebSocket.OPEN) {
-              console.log("Sending data on socket")
               socket.send(event.data);
             }
           });
@@ -39,13 +46,11 @@ function App(): JSX.Element {
         };
 
         socket.onmessage = (message) => {
-          console.log(`Received message ${JSON.stringify(message)}`)
           const received = JSON.parse(message.data);
           const result = received.channel.alternatives[0]?.transcript;
           console.log(`Received ${JSON.stringify(received)}`)
-          console.log(`Result ${result}`)
+          console.log(`Result ${JSON.stringify(result)}`)
           if (result) {
-            console.log(`Setting transcript to ${result}`)
             setTranscript((prev) => prev + ' ' + result);
           }
         };
