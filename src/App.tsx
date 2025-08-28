@@ -6,6 +6,7 @@ import { Conversation } from './models/Conversation';
 import { Turn } from './models/Turn';
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community'; 
 import ConversationTable from './ConversationTable';
+import Conversations from './Conversations';
 
 // Register all Community features
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -15,14 +16,7 @@ interface RowData {
   phrase: string;
 }
 
-const Conversations = () => {
-  return (
-    <div>
-      <h1>Conversations</h1>
-      <p>Conversation history will be displayed here.</p>
-    </div>
-  );
-};
+
 
 
 
