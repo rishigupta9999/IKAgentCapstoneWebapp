@@ -5,7 +5,7 @@ import './App.css';
 import { Conversation } from './models/Conversation';
 import { Turn } from './models/Turn';
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community'; 
-import { AgGridReact } from 'ag-grid-react'; // React Data Grid Component
+import ConversationTable from './ConversationTable';
 
 // Register all Community features
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -24,31 +24,7 @@ const Conversations = () => {
   );
 };
 
-const GridExample = ({ conversation }: { conversation: Conversation | null }) => {
-  // Convert conversation turns to row data
-  const rowData = conversation?.turns.map(turn => ({
-    speaker: turn.speaker,
-    phrase: turn.content
-  })) || [];
 
-  // Column Definitions: Defines the columns to be displayed.
-  const [colDefs, setColDefs] = useState([
-      { field: "speaker" as const },
-      { field: "phrase" as const }
-  ]);
-
-  // ...
-
-  return (
-    // Data Grid will fill the size of the parent container
-    <div style={{ height: 500 }}>
-        <AgGridReact
-            rowData={rowData}
-            columnDefs={colDefs}
-        />
-    </div>
-  )
-}
 
 
 function App(): JSX.Element {
@@ -157,7 +133,7 @@ function App(): JSX.Element {
       <div className="transcript-box">
         {transcript || (isTranscribing ? 'Listening...' : 'Click the button to begin')}
       </div>
-      <GridExample conversation={conversation}/>
+      <ConversationTable conversation={conversation}/>
     </div>
   );
 
