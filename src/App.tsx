@@ -67,9 +67,28 @@ function App(): JSX.Element {
       streamRef.current?.getTracks().forEach((track) => track.stop());
       socketRef.current?.close();
       setIsTranscribing(false);
+
+      // Send conversation to API Gateway
+      if (conversation) {
+        try {
+          const response = await fetch('https://a28etc2crk.execute-api.us-west-2.amazonaws.com/Prod/conversations', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(conversation)
+          });
+          
+          if (!response.ok) {
+            console.error('Failed to save conversation:', response.statusText);
+          }
+        } catch (error) {
+          console.error('Error saving conversation:', error);
+        }
+      }
     } else {
       setConversation({
-        id: uuidv4(),
+        conversation_id: uuidv4(),
         turns: []
       });
       

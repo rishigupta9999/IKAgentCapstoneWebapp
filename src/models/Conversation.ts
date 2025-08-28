@@ -1,6 +1,6 @@
 import { Turn } from "./Turn";
 
 export interface Conversation {
-  id: string; // UUID
+  conversation_id: string; // UUID
   turns: Turn[];
 }
