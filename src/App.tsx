@@ -7,6 +7,7 @@ import { Turn } from './models/Turn';
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community'; 
 import ConversationTable from './ConversationTable';
 import Conversations from './Conversations';
+import Uploads from './Uploads';
 
 // Register all Community features
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -141,12 +142,15 @@ function App(): JSX.Element {
           <div className="menu-items">
             <button onClick={() => setCurrentPage('intake')}>Intake</button>
             <button onClick={() => setCurrentPage('conversations')}>Conversations</button>
+            <button onClick={() => setCurrentPage('uploads')}>Uploads</button>
           </div>
         )}
       </div>
       
       <div className={`main-content ${menuOpen ? 'shifted' : ''}`}>
-        {currentPage === 'intake' ? <IntakePage /> : <Conversations />}
+        {currentPage === 'intake' && <IntakePage />}
+        {currentPage === 'conversations' && <Conversations />}
+        {currentPage === 'uploads' && <Uploads />}
       </div>
     </div>
   ); 
