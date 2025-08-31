@@ -34,6 +34,24 @@ const Conversations = () => {
       headerName: 'Turn Count', 
       valueGetter: (params) => params.data.turns.length,
       flex: 1 
+    },
+    {
+      field: 'conversation_analysis.topic',
+      headerName: 'Topic',
+      valueGetter: (params) => params.data.conversation_analysis?.topic || '',
+      flex: 1
+    },
+    {
+      field: 'conversation_analysis.goal',
+      headerName: 'Goal',
+      valueGetter: (params) => params.data.conversation_analysis?.goal || '',
+      flex: 1
+    },
+    {
+      field: 'conversation_analysis.success',
+      headerName: 'Success',
+      valueGetter: (params) => params.data.conversation_analysis?.success || '',
+      flex: 1
     }
   ];
 
