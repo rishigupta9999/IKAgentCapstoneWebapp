@@ -5,4 +5,5 @@ export interface Conversation {
   conversation_id: string; // UUID
   turns: Turn[];
   conversation_analysis?: ConversationAnalysis;
+  summary?: string;
 }

@@ -53,6 +53,12 @@ const Conversations = () => {
       headerName: 'Success',
       valueGetter: (params) => params.data.conversation_analysis?.success || '',
       flex: 1
+    },
+    {
+      field: 'conversation_analysis.summary',
+      headerName: 'Summary',
+      valueGetter: (params) => params.data.conversation_analysis?.summary || '',
+      flex: 2
     }
   ];
 
@@ -125,7 +131,28 @@ const Conversations = () => {
       </div>
       {selectedConversation && (
         <div style={{ marginTop: '20px' }}>
-          <h2>Turns for Conversation: {selectedConversation.conversation_id}</h2>
+          <h2>Details for Conversation: {selectedConversation.conversation_id}</h2>
+          
+          {selectedConversation.conversation_analysis && (
+            <div style={{ marginBottom: '20px', padding: '15px', border: '1px solid #ccc', borderRadius: '5px' }}>
+              <h3>Conversation Analysis</h3>
+              <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '10px', alignItems: 'start' }}>
+                <strong>Topic:</strong>
+                <span>{selectedConversation.conversation_analysis.topic || 'N/A'}</span>
+                
+                <strong>Goal:</strong>
+                <span>{selectedConversation.conversation_analysis.goal || 'N/A'}</span>
+                
+                <strong>Success:</strong>
+                <span>{selectedConversation.conversation_analysis.success || 'N/A'}</span>
+                
+                <strong>Summary:</strong>
+                <div style={{ whiteSpace: 'pre-wrap' }}>{selectedConversation.summary || 'N/A'}</div>
+              </div>
+            </div>
+          )}
+          
+          <h3>Turns</h3>
           <div className="ag-theme-alpine" style={{ height: 300, width: '100%' }}>
             <AgGridReact
               rowData={selectedConversation.turns}
